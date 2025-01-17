@@ -1,13 +1,15 @@
 <?php
 
 session_start();
-// RM559.69 MOOMOO
+
 if(isset($_POST['add_to_cart'])){
   if(isset($_SESSION['cart'])){ // if cart is not empty
 
     $products_array_ids = array_column($_SESSION['cart'],"product_id");
     // compare to check if the add to cart product id already exist or not
     if(!in_array($_POST['product_id'], $products_array_ids)){
+
+      $product_id = $_POST['product_id'];
 
         $product_array = array(
           'product_id' => $_POST['product_id'],
@@ -48,7 +50,15 @@ if(isset($_POST['add_to_cart'])){
     $_SESSION['cart'][$product_id] = $product_array;
 
   }
-}else{
+  //remove product from cart
+}else if(isset($_POST['remove_product'])){
+
+  $product_id = $_POST['product_id'];
+  unset($_SESSION['cart'][$product_id]);
+
+}
+
+else{
   header('location:index.php');
 
 }
@@ -92,7 +102,7 @@ if(isset($_POST['add_to_cart'])){
                 <a class="nav-link" href="contact.html">Contact Us</a>
               </li>
               <li class="nav-item">
-                <a href="cart.html"><i class="fas fa-shopping-bag"></i></a>
+                <a href="cart.php"><i class="fas fa-shopping-bag"></i></a>
                 <a href="account.html"><i class="fas fa-user"></i></a>
               </li>
             </ul>
@@ -116,7 +126,7 @@ if(isset($_POST['add_to_cart'])){
             </tr>
 
             <?php foreach ($_SESSION['cart'] as $key =>$value){ ?>
-            <!---->
+            
             <tr>
                 <td>
                     <div class="product-info">
@@ -125,7 +135,11 @@ if(isset($_POST['add_to_cart'])){
                             <p><?php echo $value['product_name'];?></p>
                             <small><span>RM</span> <?php echo $value['product_price'];?></small>
                             <br>
-                            <a class="remove-btn" href="#">Remove</a>
+                            <form method="POST" action="cart.php">
+                              <input type="hidden" name="product_id" value="<?php echo $value['product_id']; ?>"/>
+                              <input type="submit" name="remove_product" class="remove-btn" value="remove"/>
+                            </form>
+
                         </div>
                     </div>
                 </td>
@@ -140,8 +154,7 @@ if(isset($_POST['add_to_cart'])){
                   <span class="product-price">155</span>
                 </td>
             </tr>
-            <!---->
-            <?php }?>
+            <?php } ?>
         </table>
 
         <div class="cart-total">
